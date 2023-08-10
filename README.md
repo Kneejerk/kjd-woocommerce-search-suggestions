@@ -35,12 +35,14 @@ memory usage. As each ecom site is different, your results may vary.
 ### Getting a Suggestion
 
 The most important filter to worry about is the `kjdwss-get-suggestion` filter. You can pass any string through that
-filter, and on priority 1, KJDWSS will do a suggestion replacement. It would look something like this:
+filter, and on priority 10, KJDWSS will do a suggestion replacement. It would look something like this:
 
 ```
 $suggestion = apply_filters('kjdwss-get-suggestion', "Nachos, Bananas, and Tequila!" );
 // depending on YOUR products, you might see: Did you mean: macho banana and tequila
 ```
+
+Priority 10 allows you to do any replacements before KJDWSS gets a swing at it, but also afterwards.
 
 ### Setting the Acceptance Threshold
 
@@ -55,6 +57,18 @@ add_filter('kjdwss-acceptance-threshold', function($threshold) { return 88; } );
 It does not replace words where the match is lower than the threshold, but once it is reached, it continues searching
 the rest of the dictionary for a better match. If.... she can't find a better match (did someone say Pearl Jam?), it
 uses the highest matching word to replace.
+
+### Last chance to modify the Output
+
+The html output is also filtered. Using the `kjdwss-output` filter, you have the entire html string that you can
+replace, modify, etc...
+
+```
+add_filter('kjdwss-output', function($output) { return str_replace("Did you mean:", "Have you tried:", $output); });
+```
+
+Here the filter modifies the iconic "Did you mean:" phrase with "Have you tried:" -- now, there are more efficient ways
+to handle this, but this is the stage the plugin is at currently. Tada!
 
 ## Styling
 
