@@ -6,10 +6,10 @@ by Kneejerk Development - the penultimate "did you mean" plugin for Woocommerce!
 
 ## Requirements
 
-PHP 8.0 or greater
-WordPress 6.0 or greater
-Woocommerce 8.0 or greater
-**Object Caching: Enabled** - this is not a joke.
+- PHP 8.0 or greater
+- WordPress 6.0 or greater
+- Woocommerce 8.0 or greater
+- **Object Caching: Enabled** - this is not a joke.
 
 ## How does it work?
 
