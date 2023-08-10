@@ -18,23 +18,27 @@ define( 'KJDWSS_BASEDIR', __DIR__ . DIRECTORY_SEPARATOR );
 require_once KJDWSS_SRCDIR . 'dym.php';
 require_once KJDWSS_SRCDIR . 'functions.php';
 
-add_action( 'woocommerce_no_products_found', function() { // add the form into our theme's added hook
-    if ( empty($_GET['s'] ?? []) ) { // this way if 's' isn't set, we'll move on.
+add_action( 'woocommerce_no_products_found', function() {
+    // nothing to do if 's' (search) isn't set...
+    if ( empty($_GET['s'] ?? []) ) {
         return;
     }
 
-    $suggestion = apply_filters('kjdwss-get-suggestion', $_GET['s'] );
+    $time = microtime(true);
+    $suggestion = apply_filters( 'kjdwss-get-suggestion', $_GET['s'] );
+    $time = round(microtime(true) - $time, 5);
     if ( $suggestion == false ) {
         return;
     }
 
-    $content = KJDWSS_grab(KJDWSS_TEMPLATEDIR . 'dym_suggestion.php', ['suggestion' => $suggestion]);
+    $url = KJDWSS_linkify_suggestion( $suggestion );
+    $content = KJDWSS_grab(KJDWSS_TEMPLATEDIR . 'dym_suggestion.php', ['suggestion' => $suggestion, 'url' => $url]);
 
+    echo "\n<!-- KJDWSS: Generated suggestion in {$time} seconds -->\n";
     echo apply_filters('kjdwss-output', $content);
 }, 12 );
 
-add_filter( 'kjdwss-get-suggestion', function( $suggestion ) {
+add_filter( 'kjdwss-get-suggestion', function( $search ) {
     $dym = new KJDWSS_DYM();
-    $suggestion = $dym->suggestions( $suggestion );
-    return $suggestion;
-}, 1, 1);
+    return $dym->suggestions( $search, apply_filters('kjdwss-acceptance-threshold', 75 ) );
+}, 10, 1);

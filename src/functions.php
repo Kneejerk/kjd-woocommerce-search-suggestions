@@ -20,3 +20,21 @@ function KJDWSS_grab( $template, $data = [] ) {
     KJDWSS_view( $template, $data );
     return ob_get_clean();
 }
+
+function KJDWSS_linkify_suggestion( $suggestion ) {
+    $current_url = KJDWSS_unpaginate_url(KJDWSS_get_current_url());
+    return add_query_arg(array_merge($_GET, ['s'=>urlencode($suggestion)]), $current_url);
+}
+
+function KJDWSS_get_current_url() {
+    global $wp;
+    $current_url = home_url( $wp->request );
+    return rtrim($current_url, '/') . '/';
+}
+
+function KJDWSS_unpaginate_url($url) {
+    // get the position where '/page/2' text start.
+    $pos = strpos($url, '/page/');
+    // if it's there, remove string from the specific postion
+    return $pos !== false ? substr($url, 0, $pos) : $url;
+}
