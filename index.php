@@ -28,7 +28,6 @@ add_action( 'woocommerce_no_products_found', function() { // add the form into o
         return;
     }
 
-    // For simplicity, please provide an absolute path...
     $content = KJDWSS_grab(KJDWSS_TEMPLATEDIR . 'dym_suggestion.php', ['suggestion' => $suggestion]);
 
     echo apply_filters('kjdwss-output', $content);

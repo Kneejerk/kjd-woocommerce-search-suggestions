@@ -1,13 +1,17 @@
 <?php
 
 // Quick view function to encapsulate the template include...
-function KJDWSS_view( $template, $data = [] ) {
-    $template = KJDWSS_TEMPLATEDIR . $template . '.php';
-    if ( !file_exists($template) ) {
-        throw new Exception('Template not found: ' . $template);
+function KJDWSS_view( $template_path, $data = [] ) {
+    $real_path = realpath( $template_path );
+    if ( !file_exists($real_path) ) {
+        throw new Exception('Template not found: ' . $real_path);
     }
+
+    // Nope!
+    if ( isset($data['real_path']) ) unset($data['real_path']);
     extract($data);
-    include $template;
+
+    include $real_path;
 }
 
 // Return the view instead of rendering it outright.
