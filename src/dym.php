@@ -127,11 +127,6 @@ class KJDWSS_DYM
         return round($rating * 100, 5);
     }
 
-    public function super_trim_word($word)
-    {
-        return trim($word, '"“”’_-,.:;!?<>()\\|/[]{}+=*&^%$#@`~ ' . "'\t\n\r\0\x0B");
-    }
-
     public function make_dictionary()
     {
         $table = JJ::$db->posts;
@@ -140,29 +135,30 @@ class KJDWSS_DYM
         );
 
         $filter_words = $this->get_filter_words();
+
+        // $words functions like a set, rather than a list.
         $words = [ // Adding in some basics so we don't start suggesting the wrong gender (ie: "womens stuff" suggests "mens stuff")
             'mens'=>0,
             'womens'=>0,
-            "men's"=>0,
-            "women's"=>0,
         ];
+
         foreach ($products as $product) {
             $product_words = explode(' ', $product->post_title . ' ' . $product->post_content);
+            $product_words = array_unique($product_words);
             foreach ( $product_words as $word ) {
+                $word = strtolower($word);
                 if ( strpos($word, '/') !== false ) {
                     $clean_words = explode('/', $word);
                     foreach ( $clean_words as $clean_word ) {
-                        $clean_word = $this->super_trim_word($clean_word);
-                        $tmp = preg_replace('/[[:punct:]]/', '', $clean_word);
-                        if ( strlen($clean_word) <= 3 || is_numeric($clean_word) || is_numeric($tmp) || in_array($clean_word, $filter_words) ) {
+                        $clean_word = KJDWSS_super_trim($clean_word);
+                        if ( strlen($clean_word) < 3 || is_numeric($clean_word) || in_array($clean_word, $filter_words) ) {
                             continue;
                         }
                         $words[$clean_word] = 0;
                     }
                 } else {
-                    $clean_word = $this->super_trim_word(strtolower($word));
-                    $tmp = preg_replace('/[[:punct:]]/', '', $clean_word);
-                    if ( strlen($clean_word) <= 3 || is_numeric($clean_word) || is_numeric($tmp) || in_array($clean_word, $filter_words) ) {
+                    $clean_word = KJDWSS_super_trim($word);
+                    if ( strlen($clean_word) < 3 || is_numeric($clean_word) || in_array($clean_word, $filter_words) ) {
                         continue;
                     }
                     $words[$clean_word] = 0; // we don't care how many times it's in there, just that it is.
@@ -209,6 +205,8 @@ class KJDWSS_DYM
         $search_words = explode(' ', $search);
         $search_words = array_filter($search_words);
         foreach ( $search_words as $search_word ) {
+            $search_word = KJDWSS_normalize_string($search_word);
+            // check for contractions in the filter list too...
             if ( in_array(str_replace("'",'',$search_word), $filter_words) ) {
                 $did_you_mean[] = $search_word;
                 continue;

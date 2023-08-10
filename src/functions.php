@@ -21,6 +21,20 @@ function KJDWSS_grab( $template, $data = [] ) {
     return ob_get_clean();
 }
 
+// Trims a string to help with search suggestions.
+function KJDWSS_super_trim($word) {
+    return preg_replace('/\W/', '', $word);
+}
+
+function KJDWSS_normalize_string($string) {
+    $parts = explode( ' ', strtolower($string) );
+    $normalized_string = [];
+    foreach ( $parts as $part ) {
+        $normalized_string[] = KJDWSS_super_trim( $part );
+    }
+    return join( ' ', $normalized_string );
+}
+
 function KJDWSS_linkify_suggestion( $suggestion ) {
     $current_url = KJDWSS_unpaginate_url(KJDWSS_get_current_url());
     return add_query_arg(array_merge($_GET, ['s'=>urlencode($suggestion)]), $current_url);

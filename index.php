@@ -25,17 +25,24 @@ add_action( 'woocommerce_no_products_found', function() {
     }
 
     $time = microtime(true);
-    $suggestion = apply_filters( 'kjdwss-get-suggestion', $_GET['s'] );
+    $search = $_GET['s'];
+    $suggestion = apply_filters( 'kjdwss-get-suggestion', $search );
     $time = round(microtime(true) - $time, 5);
     if ( $suggestion == false ) {
         return;
     }
 
+    $normalized_search = KJDWSS_normalize_string( $search );
+
+    // If we haven't actually suggested any changes, let's not suggest anything.
+    if ( $suggestion == $normalized_search ) {
+        return;
+    }
+
     $url = KJDWSS_linkify_suggestion( $suggestion );
     $content = KJDWSS_grab(KJDWSS_TEMPLATEDIR . 'dym_suggestion.php', ['suggestion' => $suggestion, 'url' => $url]);
-
-    echo "\n<!-- KJDWSS: Generated suggestion in {$time} seconds -->\n";
     echo apply_filters('kjdwss-output', $content);
+    echo "\n<!-- KJDWSS: Generated suggestion in {$time} seconds -->\n";
 }, 12 );
 
 add_filter( 'kjdwss-get-suggestion', function( $search ) {
